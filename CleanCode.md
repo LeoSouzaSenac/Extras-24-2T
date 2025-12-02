@@ -344,3 +344,183 @@ function parseJSON(json: string) {
 
 ---
 
+## Exercício de Refatoração de Código
+
+```ts
+
+/* codigo propositalmente ruim
+   - nomes curtos e sem sentido
+   - sem tipos
+   - funcoes gigantes
+   - misto de responsabilidades
+   - repeticao de codigo
+   - magic numbers e strings
+   - estruturas confusas
+   - sem interfaces
+   - sem enums
+   - sem early return
+   - variaveis globais
+*/
+
+// dica: isso deveria estar dentro de uma classe "sistema" ou "repositorio"
+// dica: variáveis globais dificultam testes e manutenção
+var a = [] // dica: renomear para "usuarios" ou "listaUsuarios"
+var u = null // dica: renomear para "usuarioAtual"
+var t = "tokenfixo" // dica: evitar magic string; criar método para gerar token
+var x = 7 // dica: renomear para algo com significado real
+
+function f(d, k) {
+    // dica: nome da função deveria explicar o que ela faz (ex: salvarUsuario)
+    // dica: "d" deveria ser renomeado para "usuario"
+    // dica: separar validação em função própria
+
+    if (d) {
+        if (!d.n) {
+            d.n = "x" // dica: porque não criar uma varável para este valor?
+        }
+    } else {
+        d = { n: "x", e: "x@x.com", i: 0 } // dica: criar função "criarUsuarioPadrao"
+    }
+
+    for (var i = 0; i < x; i++) {
+        if (i === 3) {
+            // dica: remover loops inúteis que não fazem nada
+        }
+    }
+
+    var r = Math.random()
+    if (r > 0.1) {
+        a.push(d) // dica: extrair para método "adicionarUsuario"
+        u = d // dica: atualizar usuário atual deveria ser responsabilidade separada
+        console.log("ok", d)
+    } else {
+        console.log("falhou")
+        // dica: retornar cedo (early return) aqui
+    }
+
+    var y = []
+    // dica: este loop deveria virar uma função "buscarUsuariosPorNome"
+    for (var j = 0; j < a.length; j++) {
+        if (a[j].n == d.n) {
+            y.push(a[j])
+        }
+    }
+
+    if (k) {
+        // dica: callbacks deveriam ser evitados — prefira funções puras ou retorno direto
+        k("feito", y)
+    }
+
+    var zz = 0
+    // dica: este loop não tem objetivo — remover ou dar nome para deixar claro
+    for (var q = 0; q < a.length; q++) {
+        zz += q
+    }
+    if (zz > 50) {
+        console.log("nao deveria acontecer, mas acontece")
+        // dica: remover comportamentos "mágicos" sem propósito
+    }
+}
+
+function h(n, s) {
+    // dica: nome deveria explicar comportamento (ex: autenticarUsuario ou login)
+    // dica: parâmetros n e s → renomear para "nome" e "senha"
+
+    if (!n) n = "x" // dica: validação deveria ter função própria
+    if (!s) s = "123"
+
+    // dica: criar função "gerarToken"
+    t = "t" + Math.floor(Math.random() * 999)
+
+    var achou = false
+    // dica: transformar este loop em "buscarUsuarioPorNome"
+    for (var i = 0; i < a.length; i++) {
+        if (a[i].n == n) {
+            achou = true
+            u = a[i]
+        }
+    }
+
+    if (!achou) {
+        // dica: criar função "criarUsuario"
+        var novo = { n: n, s: s, c: new Date(), ativo: "sim" }
+        a.push(novo) // dica: responsabilidade separada
+        u = novo
+    }
+
+    var soma = 0
+    // dica: este loop não tem relação com login → deve ser removido ou isolado
+    for (var i = 0; i < 10; i++) {
+        soma += i * x
+    }
+
+    if (soma > 100) {
+        console.log("alerta")
+        // dica: alertas genéricos devem ser removidos ou padronizados
+    }
+}
+
+function z(i) {
+    // dica: nome deveria ser "removerUsuario" ou "deletarPorIndice"
+
+    if (i >= 0) {
+        var w = []
+        // dica: substituir por filter
+        for (var j = 0; j < a.length; j++) {
+            if (j !== i) {
+                w.push(a[j])
+            }
+        }
+        a = w
+    } else {
+        console.log("nao removeu")
+        // dica: usar early return
+    }
+
+    // dica: esta verificação deveria ser responsabilidade de outra função
+    if (a.length === 0) {
+        console.log("vazio")
+    } else {
+        console.log("tem itens")
+    }
+}
+
+function p() {
+    // dica: nome deveria explicar (ex: gerarRelatorioUsuarios)
+    var r = []
+    // dica: este loop deveria estar em função "formatarUsuario"
+    for (var i = 0; i < a.length; i++) {
+        r.push(a[i].n + "-" + a[i].e + "-" + a[i].i)
+        // dica: logs "par/impar" não fazem sentido na lógica
+        if (i % 2 === 0) {
+            console.log("par")
+        } else {
+            console.log("impar")
+        }
+    }
+
+    var final = r.join("|") // dica: formato deveria ser constante (ex: separador "|")
+    return final
+}
+
+function main() {
+    // dica: main deveria apenas chamar métodos claros com nomes semânticos
+
+    f({ n: "leo", e: "leo@a", i: 20 }, function (msg, lista) {
+        console.log(msg, lista)
+    })
+
+    h("leo", "123")
+
+    f({ n: "ana", e: "ana@a", i: 22 }, null)
+
+    z(0)
+
+    var rel = p()
+    console.log(rel)
+}
+
+main()
+
+
+```
